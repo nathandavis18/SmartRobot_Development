@@ -4,9 +4,16 @@
 
 class SmartRobot{
 public:
+    struct Command
+    {
+        float velocity, distance, heading;
+        Command(float v, float d, float h) : velocity(v), distance(d), heading(h) {}
+        Command() : velocity(0), distance(0), heading(0) {}
+    };
+public:
   SmartRobot(void);
 
-  void SmartRobotInit(void);
+  void SmartRobotInit();
 
   void updateMotion(float speed, float distance);
   void updateAngle(float newHeading);

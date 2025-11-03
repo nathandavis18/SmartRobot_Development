@@ -5,33 +5,35 @@
 namespace sr{
   class MyVariant{
   public:
-    union {
+    union Value {
       Attitude a;
       PathAssignment pa;
       Position p;
       Velocity v;
-    };
+      Value() {}
+      ~Value() {}
+    } value;
 
     enum class alternative_t{
       attitude, pathassignment, position, velocity, none
     };
     alternative_t alternative;
 
-    MyVariant() : alternative(alternative_t::none) {}
+    MyVariant() : alternative(alternative_t::none), value() {}
 
     MyVariant(const MyVariant& other) : alternative(other.alternative) {
       switch(other.alternative){
         case alternative_t::attitude:
-          this->a = other.a;
+          this->value.a = other.value.a;
           break;
         case alternative_t::pathassignment:
-          this->pa = other.pa;
+          this->value.pa = other.value.pa;
           break;
         case alternative_t::position:
-          this->p = other.p;
+          this->value.p = other.value.p;
           break;
         case alternative_t::velocity:
-          this->v = other.v;
+          this->value.v = other.value.v;
           break;
         case alternative_t::none:
           break;
@@ -41,16 +43,16 @@ namespace sr{
     ~MyVariant() {
       switch(alternative){
         case alternative_t::attitude:
-          this->a.~Attitude();
+          this->value.a.~Attitude();
           break;
         case alternative_t::pathassignment:
-          this->pa.~PathAssignment();
+          this->value.pa.~PathAssignment();
           break;
         case alternative_t::position:
-          this->p.~Position();
+          this->value.p.~Position();
           break;
         case alternative_t::velocity:
-          this->v.~Velocity();
+          this->value.v.~Velocity();
           break;
         case alternative_t::none:
           break;

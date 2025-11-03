@@ -1,9 +1,11 @@
 #include "SmartRobot.h"
-#include "ArduinoJson-v6.11.1.h"
 #include "../lib/Array.hpp"
 #include "../lib/String.hpp"
+#include "../lib/JsonDict.hpp"
+#include "../../UnoBoard.hpp"
 
-using ARDUINOJSON_NAMESPACE::StaticJsonDocument;
+using namespace UnoBoard;
+
 using MySmallString = details::BasicCustomString<30>;
 using MyBigString = details::BasicCustomString<600>;
 
@@ -13,16 +15,9 @@ float currentVelocity = 0;
 float currentDistanceMoved = 0;
 unsigned long lastDistanceInterval = 0;
 
-
 SmartRobot::SmartRobot(void) : _mode(SmartRobotMode::Standby), _currentHeading(0) {}
 
-struct Command {
-	float velocity, distance, heading;
-	Command(float v, float d, float h) : velocity(v), distance(d), heading(h) {}
-	Command() : velocity(0), distance(0), heading(0) {}
-};
-
-sr::MyArray<Command, 15> commands;
+sr::MyArray<SmartRobot::Command, 15> commands;
 
 void sendStandbyMode(void) {
 	Serial.println(F("{Smart Robot,Standby}\x1b"));
@@ -67,11 +62,11 @@ void SmartRobot::SmartRobotInit() {
 uint8_t commandsIndex = 0;
 
 MyBigString buffer = "";
-String splitData = "";
+JsonString splitData = "";
 void SmartRobot::getSerialData() {
 	if (_mode == SmartRobotMode::Unknown || _mode == SmartRobotMode::Estop) return;
 
-	char c = "";
+	char c = 0;
 	int x = Serial.available();
 	while (x) {
 		c = Serial.read();
@@ -83,22 +78,22 @@ void SmartRobot::getSerialData() {
 
 	static int strIndex = 0;
 	static Command currentCommand;
-	if (c == '\x1b' && buffer[0] == '{') {
+	if (c == '\x1b' && buffer.char_at(0) == '{') {
 		commands.clear();
-		StaticJsonDocument<200> doc;
+		sr::MyDictionary dict;
 		while (strIndex < buffer.length()) {
-			while (buffer.charAt(strIndex) != '~' && buffer.charAt(strIndex) != '\x1b') {
-				splitData += buffer.charAt(strIndex);
+			while (buffer.char_at(strIndex) != '~' && buffer.char_at(strIndex) != '\x1b') {
+				splitData += buffer.char_at(strIndex);
 				++strIndex;
 			}
-			deserializeJson(doc, splitData);
-			currentCommand.velocity = doc["v"];
-			currentCommand.distance = doc["d"];
-			currentCommand.heading = getDegrees(doc["h"]);
+			sr::parse_json(splitData, dict);
+			currentCommand.velocity = dict["v"];
+			currentCommand.distance = dict["d"];
+			currentCommand.heading = getDegrees(dict["h"]);
 
-			doc.clear();
+			dict.clear();
 			splitData = "";
-			commands.insert(currentCommand);
+			commands.insert_back(currentCommand);
 			++strIndex;
 		}
 
@@ -112,13 +107,13 @@ void SmartRobot::getSerialData() {
 
 
 	}
-	else if (buffer.length() && buffer[0] != '{') buffer.clear();
+	else if (buffer.length() && buffer.char_at(0) != '{') buffer.clear();
 }
 
 bool awaitingCommand = true;
 
 void SmartRobot::startCommand() {
-	if (commandsIndex >= commands.items()) return;
+	if (commandsIndex >= commands.size()) return;
 
 	distanceLeft = fabs(commands[commandsIndex].distance);
 	currentVelocity = fabs(commands[commandsIndex].velocity);
@@ -152,7 +147,7 @@ void SmartRobot::updateDistanceData() {
 		sendDistanceMoved();
 	}
 	else {
-		if (commandsIndex < commands.items()) {
+		if (commandsIndex < commands.size()) {
 			stopRobot();
 			startCommand();		
 		}
@@ -190,7 +185,7 @@ void SmartRobot::sendDistanceMoved(bool forced) {
 	message = "{Smart Robot,Distance}";
 	message.concat(distanceMovedSinceLastSend);
 	message.concat('\x1b');
-	Serial.println(message);
+	Serial.println(message.c_str());
 
 	message.clear();
 	distanceMovedSinceLastSend = 0;

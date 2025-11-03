@@ -17,6 +17,8 @@
     #if I2CDEV_IMPLEMENTATION == I2CDEV_I2CMASTER_LIBRARY
         #include <I2C.h>
     #endif
+#else
+#include <Arduino.h>
 #endif
 #define I2CDEV_DEFAULT_READ_TIMEOUT     1000
 class I2Cdev {

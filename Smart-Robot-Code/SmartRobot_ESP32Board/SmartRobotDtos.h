@@ -27,7 +27,7 @@ namespace sr{
     unsigned long pathID;
     MyArray<Waypoint, 20> waypoints;
 
-    PathAssignment() : pathID(0) {}
+    PathAssignment() : pathID(0), waypoints(MyArray<Waypoint, 20>()) {}
   };
 
   struct SmartRobotAsset{

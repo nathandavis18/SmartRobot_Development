@@ -8,7 +8,7 @@ namespace sr
 	class MyArray
 	{
 	public:
-		MyArray() : _numItems(0) {}
+		MyArray() : _numItems(0), _data({ T() }) {}
 		MyArray(const MyArray& other) : _numItems(other._numItems)
 		{
 			for (SizeType i = 0; i < _numItems; ++i)
@@ -120,6 +120,16 @@ namespace sr
 			return _data[_numItems - 1];
 		}
 
+		bool contains(const T& val) const
+		{
+			for(SizeType i = 0; i < _numItems; ++i)
+			{
+				if (_data[i] == val)
+					return true;
+			}
+			return false;
+		}
+
 		constexpr SizeType size() const
 		{
 			return _numItems;
@@ -128,6 +138,18 @@ namespace sr
 		constexpr SizeType capacity() const
 		{
 			return N;
+		}
+
+		bool operator==(const MyArray<T, N>& other) const
+		{
+			if (_numItems != other._numItems)
+				return false;
+			for (SizeType i = 0; i < _numItems; ++i)
+			{
+				if (!(_data[i] == other._data[i]))
+					return false;
+			}
+			return true;
 		}
 
 	protected:

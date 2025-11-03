@@ -17,9 +17,14 @@ FetchContent_MakeAvailable(min_sock)
 add_executable(SmartRobot_Rework
     "SmartRobot_Rework.cpp"
     "Smart-Robot-Code/SmartRobot_ESP32Board/MessageSerializer.cpp"
-)
+    "UnoBoard.cpp" "UnoBoard.hpp"
+    "ESP32Board.cpp" "ESP32Board.hpp"
+    "Smart-Robot-Code/SmartRobot_UnoBoard/DeviceDrivers.cpp"
+    "Smart-Robot-Code/SmartRobot_UnoBoard/I2Cdev.cpp"
+    "Smart-Robot-Code/SmartRobot_UnoBoard/SmartRobot.cpp"
+ "lib/Arduino.h" "lib/avr/wdt.h")
 
-target_include_directories(SmartRobot_Rework PRIVATE lib Smart-Robot-Code/SmartRobot_ESP32Board Smart-Robot-Code/lib)
+target_include_directories(SmartRobot_Rework PRIVATE lib Smart-Robot-Code/SmartRobot_ESP32Board Smart-Robot-Code/lib Smart-Robot-Code/SmartRobot_UnoBoard)
 target_link_libraries(SmartRobot_Rework PRIVATE
     MinimalSocket
 )
