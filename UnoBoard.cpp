@@ -3,7 +3,7 @@
 
 namespace UnoBoard
 {
-    SmartRobot robot;
+    sr::SmartRobot robot;
     void setup()
     {
         robot.SmartRobotInit();

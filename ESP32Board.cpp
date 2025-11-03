@@ -113,7 +113,7 @@ namespace ESP32Board
 
 			if (c == '\x1b' && receiveBuff.length())
 			{
-				Serial.print("Received from robot: "); //Serial.println(receiveBuff.c_str());
+				Serial.print("Received from robot: "); Serial.println(receiveBuff.c_str());
 				handleMessageFromRobot();
 				receiveBuff.clear();
 				robotMsgData.clear();
@@ -162,7 +162,7 @@ namespace ESP32Board
 		lastX = obj.value.pa.waypoints.last().point.x;
 		lastY = obj.value.pa.waypoints.last().point.y;
 
-		Serial.print("Sending to robot: "); Serial.println(message.c_str());
+		Serial.print("Sending to robot: "); Serial.println(message.substring(0, message.length() - 1));
 		Serial2.print(message.c_str());
 
 		message.clear();

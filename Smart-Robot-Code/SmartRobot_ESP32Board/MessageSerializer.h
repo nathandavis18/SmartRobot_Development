@@ -1,15 +1,12 @@
 #pragma once
 #pragma warning(disable : 4996)
-
 #include <type_traits>
-
 #include "MyVariant.h"
 #include "SmartRobotDtos.h"
 #include "../lib/String.hpp"
 
 namespace sr
 {
-
 	enum class MsgFromRobotType
 	{
 		Standby,
@@ -44,6 +41,8 @@ namespace sr
 	void serializeCurrentSegment(const CurrentSegment& obj, DefaultString& outMsg);
 
 	void deserialize(const DefaultString& msg, MyVariant& outObj);
+
+	bool deserializeRobotMessage(const DefaultString& msg, RobotMessageData& outObj);
 
 	template<class>
 	struct always_false : std::false_type {};
@@ -85,6 +84,4 @@ namespace sr
 			static_assert(always_false<T>::value, "Unsupported type for serialization");
 		}
 	}
-
-	bool deserializeRobotMessage(const DefaultString& msg, RobotMessageData& outObj);
 }

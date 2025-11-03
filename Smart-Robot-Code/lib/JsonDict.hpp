@@ -1,11 +1,12 @@
 #pragma once
 #include "Array.hpp"
 #include "String.hpp"
-using JsonStringKey = details::BasicCustomString<10>;
-using JsonString = details::BasicCustomString<200>;
 
 namespace sr
 {
+	using JsonStringKey = details::BasicCustomString<10>;
+	using JsonString = details::BasicCustomString<200>;
+
 	namespace details
 	{
 		struct KeyValuePair

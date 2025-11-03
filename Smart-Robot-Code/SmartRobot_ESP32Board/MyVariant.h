@@ -1,7 +1,7 @@
 #pragma once
 #pragma warning(disable : 4996)
-
 #include "SmartRobotDtos.h"
+
 namespace sr
 {
 	class MyVariant

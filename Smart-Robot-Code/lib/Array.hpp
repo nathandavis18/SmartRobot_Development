@@ -55,7 +55,7 @@ namespace sr
 		{
 			if (_numItems == 0)
 				return;
-			_data[--_numItems].~T();
+			_data[--_numItems] = T();
 		}
 
 		void remove_at(SizeType index)
