@@ -1,4 +1,4 @@
-#include <WiFi.h>
+﻿#include <WiFi.h>
 #include <cmath>
 #include "MessageSerializer.h"
 #include "SmartRobotDtos.h"
@@ -162,14 +162,13 @@ namespace ESP32Board
 		lastX = obj.value.pa.waypoints.last().point.x;
 		lastY = obj.value.pa.waypoints.last().point.y;
 
-		Serial.print("Sending to robot: "); Serial.println(message.substring(0, message.length() - 1));
+		Serial.print("Sending to robot: "); Serial.println(message.substring<sr::DefaultString>(0, message.length() - 1).c_str());
 		Serial2.print(message.c_str());
 
 		message.clear();
 
 		attitude.yaw = obj.value.pa.waypoints.last().heading;
-		velocity.x = fabs(vel * std::cos(heading));
-		velocity.y = fabs(vel * std::sin(heading));
+		velocity.x = fabs(vel);
 		standby = false;
 	}
 

@@ -1,4 +1,4 @@
-#include "MessageSerializer.h"
+﻿#include "MessageSerializer.h"
 #include "Split.h"
 
 namespace sr
@@ -12,7 +12,7 @@ namespace sr
 	{
 		try
 		{
-			split<2>(msg.substring(1, msg.index_of('}') - 1), headerParts);
+			split<2>(msg.substring<HeaderString>(1, msg.index_of('}') - 1), headerParts);
 			if (headerParts.size() < 2)
 			{
 				goto clearandend;
@@ -25,7 +25,7 @@ namespace sr
 			else if (headerParts[1] == "Distance")
 			{
 				outObj.type = MsgFromRobotType::Distance;
-				other = msg.substring(msg.index_of('}') + 1);
+				other = msg.substring<SmallString>(msg.index_of('}') + 1);
 				outObj.distance = other.to_double();
 			}
 			else
@@ -43,7 +43,7 @@ namespace sr
 
 	void deserializePathAssignment(const SmallString& msg, PathAssignment& pa)
 	{
-		SplitsString part = msg.substring(0, msg.index_of(','));
+		SplitsString part = msg.substring<SplitsString>(0, msg.index_of(','));
 		pa.pathID = part.to_int();
 
 		unsigned int currentIndex = msg.index_of(',') + 1;
@@ -51,7 +51,7 @@ namespace sr
 		{
 			if (msg.char_at(currentIndex) == '[')
 			{
-				split<6>(msg.substring(currentIndex, msg.index_of(']', currentIndex) - currentIndex), waypointParts);
+				split<6>(msg.substring<HeaderString>(currentIndex, msg.index_of(']', currentIndex) - currentIndex), waypointParts);
 
 				wp.pointID = waypointParts[0].to_int();
 				wp.desiredVelocity = waypointParts[1].to_double();
@@ -72,12 +72,12 @@ namespace sr
 
 	void deserialize(const DefaultString& msg, MyVariant& outObj)
 	{
-		split<2>(msg.substring(1, msg.index_of('}') - 1), headerParts);
+		split<2>(msg.substring<HeaderString>(1, msg.index_of('}') - 1), headerParts);
 
 		if (headerParts[1] == "PathAssignment")
 		{
 			outObj.value.pa = PathAssignment();
-			other = msg.substring(msg.index_of('}') + 1);
+			other = msg.substring<SmallString>(msg.index_of('}') + 1);
 
 			outObj.alternative = MyVariant::alternative_t::pathassignment;
 			deserializePathAssignment(other, outObj.value.pa);

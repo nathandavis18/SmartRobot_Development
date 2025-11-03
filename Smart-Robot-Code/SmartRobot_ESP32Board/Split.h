@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #pragma warning(disable : 4996)
 
 #include "../lib/String.hpp"
@@ -20,7 +20,7 @@ namespace sr
 
 			if (currentPos != dataBegin && currentPos < data.length())
 			{
-				arr.insert_back(data.substring(dataBegin, currentPos - dataBegin));
+				arr.insert_back(data.substring<SplitsString>(dataBegin, currentPos - dataBegin));
 				++currentPos;
 				dataBegin = currentPos; // Move past the delimiter
 			}
@@ -34,7 +34,7 @@ namespace sr
 
 		if (currentPos != dataBegin)
 		{
-			arr.insert_back(data.substring(dataBegin, currentPos - dataBegin));
+			arr.insert_back(data.substring<SplitsString>(dataBegin, currentPos - dataBegin));
 		}
 	}
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #pragma warning(disable : 4996)
 #include "Array.hpp"
 #include <stdlib.h>
@@ -110,11 +110,12 @@ namespace sr
 				add_to_string(buf);
 			}
 
-			const char* substring(const sr::SizeType start, const sr::SizeType length = N) const
+			template<class T>
+			T substring(const sr::SizeType start, const sr::SizeType length = N) const
 			{
-				BasicCustomString<N> result;
+				T result;
 				if (start >= this->size() || length == 0)
-					return "";
+					return result;
 
 				sr::SizeType actualLength = length;
 				if (start + length > this->size())
@@ -124,7 +125,7 @@ namespace sr
 				{
 					result.concat(this->_data[start + i]);
 				}
-				return result.c_str();
+				return result;
 			}
 
 			const sr::SizeType index_of(const char c, const sr::SizeType start = 0) const
@@ -189,7 +190,7 @@ namespace sr
 	}
 	using BigString = details::BasicCustomString<1000>;
 	using DefaultString = details::BasicCustomString<500>;
-	using SmallString = details::BasicCustomString<200>;
+	using SmallString = details::BasicCustomString<400>;
 	using HeaderString = details::BasicCustomString<100>;
 	using SplitsString = details::BasicCustomString<30>;
 	using TinyString = details::BasicCustomString<30>;
