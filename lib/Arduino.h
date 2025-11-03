@@ -141,7 +141,7 @@ inline void delay(int ms)
 	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
-inline uint8_t min(uint8_t a, uint8_t b) 
+inline uint8_t min(uint8_t a, uint8_t b)
 {
 	return (a < b) ? a : b;
 }
@@ -172,7 +172,7 @@ namespace details
 
 		void print(const std::string& message)
 		{
-			if(_connectionPort == 0)
+			if (_connectionPort == 0)
 				std::cout << message;
 			else
 			{
@@ -182,18 +182,18 @@ namespace details
 				_udp.endPacket();
 			}
 		}
-		void begin(int rate, int config = 0, int rxPin = 0, int txPin = 0) 
+		void begin(int rate, int config = 0, int rxPin = 0, int txPin = 0)
 		{
-			if(_thisPort != 0)
+			if (_thisPort != 0)
 				_udp.begin(_thisPort);
 		}
-		int available() 
+		int available()
 		{
 			_udp.parsePacket();
 			return _udp.available();
 		}
-		char read() 
-		{ 
+		char read()
+		{
 			return _udp.read();
 		}
 

@@ -28,7 +28,7 @@ namespace sr
 			}
 			return *this;
 		}
-		
+
 		bool insert_back(const T& value)
 		{
 			if (_numItems >= N)
@@ -62,7 +62,7 @@ namespace sr
 		{
 			if (index >= _numItems)
 				return;
-			if(index == _numItems - 1)
+			if (index == _numItems - 1)
 			{
 				pop_back();
 				return;
@@ -84,14 +84,14 @@ namespace sr
 
 		T& at(SizeType index)
 		{
-			if(index >= _numItems)
+			if (index >= _numItems)
 				throw "Bad";
 			return _data[index];
 		}
 
 		const T& at(SizeType index) const
 		{
-			if(index >= _numItems)
+			if (index >= _numItems)
 				throw "Bad";
 			return _data[index];
 		}
@@ -122,7 +122,7 @@ namespace sr
 
 		bool contains(const T& val) const
 		{
-			for(SizeType i = 0; i < _numItems; ++i)
+			for (SizeType i = 0; i < _numItems; ++i)
 			{
 				if (_data[i] == val)
 					return true;

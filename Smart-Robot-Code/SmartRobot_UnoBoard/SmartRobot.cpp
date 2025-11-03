@@ -6,10 +6,7 @@
 
 using namespace UnoBoard;
 
-using MySmallString = details::BasicCustomString<30>;
-using MyBigString = details::BasicCustomString<600>;
-
-MySmallString message;
+sr::TinyString message;
 float distanceLeft = 0;
 float currentVelocity = 0;
 float currentDistanceMoved = 0;
@@ -19,37 +16,44 @@ SmartRobot::SmartRobot(void) : _mode(SmartRobotMode::Standby), _currentHeading(0
 
 sr::MyArray<SmartRobot::Command, 15> commands;
 
-void sendStandbyMode(void) {
+void sendStandbyMode(void)
+{
 	Serial.println(F("{Smart Robot,Standby}\x1b"));
 	delay(50);
 }
 
-void sendReceived(void) {
+void sendReceived(void)
+{
 	Serial.println(F("\x1b"));
 	delay(50);
 }
 
-float getDegrees(float radians) {
+float getDegrees(float radians)
+{
 	float degrees = radians * 180 / 3.14;
 
-	while(degrees >= 360.0) degrees -= 360.0;
-	while(degrees <= -360.0) degrees += 360.0;
+	while (degrees >= 360.0) degrees -= 360.0;
+	while (degrees <= -360.0) degrees += 360.0;
 
-	if(degrees > 180){
+	if (degrees > 180)
+	{
 		degrees = -180 + (degrees - 180);
 	}
-	if(degrees < -180){
+	if (degrees < -180)
+	{
 		degrees = 180 + (degrees + 180);
 	}
 
 	return degrees;
 }
 
-float getRadians(float degrees){
+float getRadians(float degrees)
+{
 	return degrees * 3.14 / 180;
 }
 
-void SmartRobot::SmartRobotInit() {
+void SmartRobot::SmartRobotInit()
+{
 	Serial.begin(115200);
 	_voltageControl.VoltageInit();
 	_motorControl.MotorInit();
@@ -61,14 +65,16 @@ void SmartRobot::SmartRobotInit() {
 
 uint8_t commandsIndex = 0;
 
-MyBigString buffer = "";
+sr::DefaultString buffer = "";
 JsonString splitData = "";
-void SmartRobot::getSerialData() {
+void SmartRobot::getSerialData()
+{
 	if (_mode == SmartRobotMode::Unknown || _mode == SmartRobotMode::Estop) return;
 
 	char c = 0;
 	int x = Serial.available();
-	while (x) {
+	while (x)
+	{
 		c = Serial.read();
 		if (c != '\n' && c != ' ' && c != '\t' && c != '\r')
 			buffer += c;
@@ -78,11 +84,14 @@ void SmartRobot::getSerialData() {
 
 	static int strIndex = 0;
 	static Command currentCommand;
-	if (c == '\x1b' && buffer.char_at(0) == '{') {
+	if (c == '\x1b' && buffer.char_at(0) == '{')
+	{
 		commands.clear();
 		sr::MyDictionary dict;
-		while (strIndex < buffer.length()) {
-			while (buffer.char_at(strIndex) != '~' && buffer.char_at(strIndex) != '\x1b') {
+		while (strIndex < buffer.length())
+		{
+			while (buffer.char_at(strIndex) != '~' && buffer.char_at(strIndex) != '\x1b')
+			{
 				splitData += buffer.char_at(strIndex);
 				++strIndex;
 			}
@@ -112,7 +121,8 @@ void SmartRobot::getSerialData() {
 
 bool awaitingCommand = true;
 
-void SmartRobot::startCommand() {
+void SmartRobot::startCommand()
+{
 	if (commandsIndex >= commands.size()) return;
 
 	distanceLeft = fabs(commands[commandsIndex].distance);
@@ -120,7 +130,7 @@ void SmartRobot::startCommand() {
 
 	updateAngle(commands.at(commandsIndex).heading);
 	lastDistanceInterval = millis();
-	if(commands.at(commandsIndex).distance > 0)
+	if (commands.at(commandsIndex).distance > 0)
 		updateMotion(currentVelocity, distanceLeft);
 
 	++commandsIndex;
@@ -132,10 +142,11 @@ unsigned long currentInterval;
 unsigned long timeDiff;
 constexpr uint8_t minTimeDiff = 5;
 
-void SmartRobot::updateDistanceData() {
+void SmartRobot::updateDistanceData()
+{
 	currentInterval = millis();
 	timeDiff = currentInterval - lastDistanceInterval;
-	if(timeDiff < minTimeDiff) return;
+	if (timeDiff < minTimeDiff) return;
 
 	currentDistanceMoved = currentVelocity * (timeDiff / 1000.0) * 10;
 
@@ -143,15 +154,19 @@ void SmartRobot::updateDistanceData() {
 
 	updateDistanceLeft();
 
-	if (!awaitingCommand) {
+	if (!awaitingCommand)
+	{
 		sendDistanceMoved();
 	}
-	else {
-		if (commandsIndex < commands.size()) {
+	else
+	{
+		if (commandsIndex < commands.size())
+		{
 			stopRobot();
-			startCommand();		
+			startCommand();
 		}
-		else{
+		else
+		{
 			stopRobot();
 			delay(10);
 			_mode = SmartRobotMode::Standby;
@@ -174,7 +189,8 @@ float distanceMovedSinceLastSend = 0;
 unsigned long currentTime;
 unsigned long distanceTimeDiff;
 
-void SmartRobot::sendDistanceMoved(bool forced) {
+void SmartRobot::sendDistanceMoved(bool forced)
+{
 	distanceMovedSinceLastSend += currentDistanceMoved;
 
 	currentTime = millis();
@@ -192,14 +208,16 @@ void SmartRobot::sendDistanceMoved(bool forced) {
 	lastDistanceMovedInterval = millis();
 }
 
-void SmartRobot::updateDistanceLeft() {
+void SmartRobot::updateDistanceLeft()
+{
 	distanceLeft -= currentDistanceMoved;
 
 	if (distanceLeft <= 0)
 		awaitingCommand = true;
 }
 
-bool getRotationDir(float currentHeading, float newHeading) { //True is counter-clockwise
+bool getRotationDir(float currentHeading, float newHeading)
+{ //True is counter-clockwise
 	if (newHeading < 0 && currentHeading > 0)
 		return newHeading < (180.0 - currentHeading);
 
@@ -210,33 +228,40 @@ bool getRotationDir(float currentHeading, float newHeading) { //True is counter-
 
 }
 
-void SmartRobot::updateAngle(float newHeading) {
+void SmartRobot::updateAngle(float newHeading)
+{
 	if (_currentHeading == newHeading) return;
 
-	if(fabs(_currentHeading - newHeading) <= angleEpsilon) return;
+	if (fabs(_currentHeading - newHeading) <= angleEpsilon) return;
 
-	if (getRotationDir(_currentHeading, newHeading)) { //Go counter clock-wise
+	if (getRotationDir(_currentHeading, newHeading))
+	{ //Go counter clock-wise
 		updateRobotAngle(true, false, newHeading);
 	}
-	else {
+	else
+	{
 		updateRobotAngle(false, true, newHeading);
 	}
 
 	_currentHeading = newHeading;
 }
 
-void SmartRobot::updateMotion(float speed, float distance) {
+void SmartRobot::updateMotion(float speed, float distance)
+{
 	uint16_t speedUnits = speed * 35;
 	if (speedUnits > 255) speedUnits = 255;
 
 	moveRobot(speedUnits);
 }
 
-int getTime(float currentHeading, float newHeading){
-	if(newHeading < 0 && currentHeading > 0){
+int getTime(float currentHeading, float newHeading)
+{
+	if (newHeading < 0 && currentHeading > 0)
+	{
 		newHeading += 360;
 	}
-	else if(newHeading > 0 && currentHeading < 0){
+	else if (newHeading > 0 && currentHeading < 0)
+	{
 		newHeading -= 360.0;
 	}
 
@@ -245,22 +270,25 @@ int getTime(float currentHeading, float newHeading){
 	return diff * 60 / 9;
 }
 
-void SmartRobot::updateRobotAngle(bool rightDirection, bool leftDirection, float headingToFace) {
+void SmartRobot::updateRobotAngle(bool rightDirection, bool leftDirection, float headingToFace)
+{
 	int time = getTime(_currentHeading, headingToFace);
 
 	_motorControl.setMotorControl(rightDirection, 100, leftDirection, 100);
 
 	long curTime = millis();
-	while(millis() - curTime < time) {}
+	while (millis() - curTime < time) {}
 
- 	stopRobot();
+	stopRobot();
 	delay(50);
 }
 
-void SmartRobot::moveRobot(uint8_t speed, bool forward) {
+void SmartRobot::moveRobot(uint8_t speed, bool forward)
+{
 	_motorControl.setMotorControl(forward, speed, forward, speed);
 }
 
-void SmartRobot::stopRobot() {
+void SmartRobot::stopRobot()
+{
 	_motorControl.setMotorControl(false, 0, false, 0);
 }

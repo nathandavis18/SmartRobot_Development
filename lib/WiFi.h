@@ -1,5 +1,5 @@
 /*
-* This file is intended to mimic the Arduino WiFi library using MinimalSocket for UDP communication.
+* Just using this so I can mimic including WiFi.h when using Arduino
 */
 #pragma once
 #include <Arduino.h>

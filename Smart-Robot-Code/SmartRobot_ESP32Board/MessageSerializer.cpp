@@ -1,22 +1,18 @@
-#include <exception>
-
 #include "MessageSerializer.h"
 #include "Split.h"
 
 namespace sr
 {
-	MyString header, other;
-	MyArray<MyString, 2> headerParts;
-	MyArray<MyString, 6> waypointParts;
+	SmallString other;
+	MyArray<SplitsString, 2> headerParts;
+	MyArray<SplitsString, 6> waypointParts;
 	Waypoint wp;
 
-	bool deserializeRobotMessage(const MyString& msg, RobotMessageData& outObj)
+	bool deserializeRobotMessage(const DefaultString& msg, RobotMessageData& outObj)
 	{
 		try
 		{
-			header = msg.substring(1, msg.index_of('}') - 1);
-
-			split<2>(header, headerParts);
+			split<2>(msg.substring(1, msg.index_of('}') - 1), headerParts);
 			if (headerParts.size() < 2)
 			{
 				goto clearandend;
@@ -38,17 +34,17 @@ namespace sr
 			}
 		clearandend:
 			headerParts.clear();
-			header.clear();
 			other.clear();
 		}
-		catch (std::exception ex) { return false; }
+		catch (...) { return false; }
 
 		return true;
 	}
 
-	void deserializePathAssignment(const MyString& msg, PathAssignment& pa)
+	void deserializePathAssignment(const SmallString& msg, PathAssignment& pa)
 	{
-		pa.pathID = msg.substring(0, msg.index_of(',')).to_int();
+		SplitsString part = msg.substring(0, msg.index_of(','));
+		pa.pathID = part.to_int();
 
 		unsigned int currentIndex = msg.index_of(',') + 1;
 		while (currentIndex < msg.length())
@@ -74,11 +70,9 @@ namespace sr
 		waypointParts.clear();
 	}
 
-	void deserialize(const MyString& msg, MyVariant& outObj)
+	void deserialize(const DefaultString& msg, MyVariant& outObj)
 	{
-		header = msg.substring(1, msg.index_of('}') - 1);
-
-		split<2>(header, headerParts);
+		split<2>(msg.substring(1, msg.index_of('}') - 1), headerParts);
 
 		if (headerParts[1] == "PathAssignment")
 		{
@@ -93,11 +87,10 @@ namespace sr
 			outObj.alternative = MyVariant::alternative_t::none;
 		}
 		headerParts.clear();
-		header.clear();
 		other.clear();
 	}
 
-	void serializeWaypoints(const PathAssignment& obj, MyString& outMsg)
+	void serializeWaypoints(const PathAssignment& obj, DefaultString& outMsg)
 	{
 		const Waypoint* wp = nullptr;
 		outMsg = "{Smart Robot,PathAssignment}";
@@ -122,7 +115,7 @@ namespace sr
 		}
 	}
 
-	void serializeAsset(const SmartRobotAsset& obj, MyString& outMsg)
+	void serializeAsset(const SmartRobotAsset& obj, DefaultString& outMsg)
 	{
 		outMsg = "{Smart Robot,SmartRobotAsset}";
 		outMsg += obj.name;
@@ -138,7 +131,7 @@ namespace sr
 		outMsg += obj.height;
 	}
 
-	void serializeVelocity(const Velocity& obj, MyString& outMsg)
+	void serializeVelocity(const Velocity& obj, DefaultString& outMsg)
 	{
 		outMsg = "{Smart Robot,Velocity}";
 		outMsg += obj.x;
@@ -154,7 +147,7 @@ namespace sr
 		outMsg += obj.yawRate;
 	}
 
-	void serializePosition(const Position& obj, MyString& outMsg)
+	void serializePosition(const Position& obj, DefaultString& outMsg)
 	{
 		outMsg = "{Smart Robot,Position}";
 		outMsg += obj.x;
@@ -164,7 +157,7 @@ namespace sr
 		outMsg += obj.z;
 	}
 
-	void serializeAttitude(const Attitude& obj, MyString& outMsg)
+	void serializeAttitude(const Attitude& obj, DefaultString& outMsg)
 	{
 		outMsg = "{Smart Robot,Attitude}";
 		outMsg += obj.roll;
@@ -174,13 +167,13 @@ namespace sr
 		outMsg += obj.yaw;
 	}
 
-	void serializeCurrentAssignment(const CurrentAssignment& obj, MyString& outMsg)
+	void serializeCurrentAssignment(const CurrentAssignment& obj, DefaultString& outMsg)
 	{
 		outMsg = "{Smart Robot,CurrentAssignment}";
 		outMsg += (int)obj.pathID;
 	}
 
-	void serializeCurrentSegment(const CurrentSegment& obj, MyString& outMsg)
+	void serializeCurrentSegment(const CurrentSegment& obj, DefaultString& outMsg)
 	{
 		outMsg = "{Smart Robot,CurrentSegment}";
 		outMsg += (int)obj.pointID;

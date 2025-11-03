@@ -16,7 +16,7 @@ namespace details
 	class BasicCustomString : protected sr::MyArray<char, N>
 	{
 	public:
-		BasicCustomString() : sr::MyArray<char, N>() 
+		BasicCustomString() : sr::MyArray<char, N>()
 		{
 			this->_data[0] = '\0';
 		}
@@ -50,12 +50,12 @@ namespace details
 		{
 			concat(i);
 		}
-		
+
 		void operator+=(const char c)
 		{
 			concat(c);
 		}
-		
+
 		void operator+=(const BasicCustomString& other)
 		{
 			concat(other);
@@ -68,7 +68,7 @@ namespace details
 
 		bool operator==(const char* str) const
 		{
-			if(this->length() != strlen(str))
+			if (this->length() != strlen(str))
 				return false;
 			return strcmp(this->_data, str) == 0;
 		}
@@ -103,11 +103,11 @@ namespace details
 			add_to_string(buf);
 		}
 
-		BasicCustomString substring(const sr::SizeType start, const sr::SizeType length = N) const
+		const char* substring(const sr::SizeType start, const sr::SizeType length = N) const
 		{
 			BasicCustomString<N> result;
 			if (start >= this->size() || length == 0)
-				return result;
+				return "";
 
 			sr::SizeType actualLength = length;
 			if (start + length > this->size())
@@ -117,7 +117,7 @@ namespace details
 			{
 				result.concat(this->_data[start + i]);
 			}
-			return result;
+			return result.c_str();
 		}
 
 		const sr::SizeType index_of(const char c, const sr::SizeType start = 0) const
@@ -172,7 +172,7 @@ namespace details
 	private:
 		void add_to_string(const char* buf)
 		{
-			if(strlen(buf) + this->size() >= N)
+			if (strlen(buf) + this->size() >= N)
 				return;
 
 			strcat(this->_data, buf);
@@ -183,5 +183,10 @@ namespace details
 
 namespace sr
 {
-	using MyString = details::BasicCustomString<1000>;
+	using BigString = details::BasicCustomString<1000>;
+	using DefaultString = details::BasicCustomString<500>;
+	using SmallString = details::BasicCustomString<200>;
+	using HeaderString = details::BasicCustomString<100>;
+	using SplitsString = details::BasicCustomString<30>;
+	using TinyString = details::BasicCustomString<30>;
 }

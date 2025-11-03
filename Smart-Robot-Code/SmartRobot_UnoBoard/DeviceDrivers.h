@@ -1,33 +1,36 @@
 #pragma once
 #include <stdint.h>
 
-class DeviceDriver_Key{
+class DeviceDriver_Key
+{
 public:
-  void KeyInit(void);
+	void KeyInit(void);
 
 #define PIN_KEY 2
 #define KEYVALUE_MAX 4
 
-  static uint8_t keyValue;
+	static uint8_t keyValue;
 };
 
-class DeviceDriver_Voltage{
+class DeviceDriver_Voltage
+{
 public:
-  void VoltageInit(void);
-  float getAnalogue(void);
+	void VoltageInit(void);
+	float getAnalogue(void);
 
 private:
-  #define PIN_A3  (17)
-  static constexpr uint8_t A3 = PIN_A3;
-  #define PIN_VOLTAGE A3
+#define PIN_A3  (17)
+	static constexpr uint8_t A3 = PIN_A3;
+#define PIN_VOLTAGE A3
 };
 
-class DeviceDriver_Motor{
+class DeviceDriver_Motor
+{
 public:
-  void MotorInit(void);
+	void MotorInit(void);
 
-  // For the direction, false means reverse, true means forward
-  void setMotorControl(bool leftDirection, uint8_t leftSpeed, bool rightDirection, uint8_t rightSpeed);
+	// For the direction, false means reverse, true means forward
+	void setMotorControl(bool leftDirection, uint8_t leftSpeed, bool rightDirection, uint8_t rightSpeed);
 
 private:
 #define PIN_MOTOR_PWMA 5

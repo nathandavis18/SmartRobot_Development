@@ -1,3 +1,6 @@
+/*
+* This file is only meant to stub Arduino functions for compatibility.
+*/
 #pragma once
 #define INPUT_PULLUP 0x2
 #define FALLING 0

@@ -30,7 +30,7 @@ namespace sr
 				key += str.char_at(index);
 				++index;
 			}
-			while(str.char_at(index) != ':' && index < str.length())
+			while (str.char_at(index) != ':' && index < str.length())
 				++index;
 			++index; // Move past the colon
 		}
@@ -93,7 +93,7 @@ namespace sr
 		double currentValue;
 		for (i = 1; i < str.length(); ++i)
 		{
-			while(str.char_at(i) != '\"' && i < str.length())
+			while (str.char_at(i) != '\"' && i < str.length())
 				++i;
 
 			if (i >= str.length())
