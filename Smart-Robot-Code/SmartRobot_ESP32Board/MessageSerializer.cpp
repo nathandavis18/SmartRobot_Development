@@ -3,7 +3,7 @@
 
 namespace sr
 {
-	SmallString other;
+	DefaultString other;
 	MyArray<SplitsString, 2> headerParts;
 	MyArray<SplitsString, 6> waypointParts;
 	Waypoint wp;
@@ -25,7 +25,7 @@ namespace sr
 			else if (headerParts[1] == "Distance")
 			{
 				outObj.type = MsgFromRobotType::Distance;
-				other = msg.substring<SmallString>(msg.index_of('}') + 1);
+				other = msg.substring<DefaultString>(msg.index_of('}') + 1);
 				outObj.distance = other.to_double();
 			}
 			else
@@ -41,7 +41,7 @@ namespace sr
 		return true;
 	}
 
-	void deserializePathAssignment(const SmallString& msg, PathAssignment& pa)
+	void deserializePathAssignment(const DefaultString& msg, PathAssignment& pa)
 	{
 		SplitsString part = msg.substring<SplitsString>(0, msg.index_of(','));
 		pa.pathID = part.to_int();
@@ -77,7 +77,7 @@ namespace sr
 		if (headerParts[1] == "PathAssignment")
 		{
 			outObj.value.pa = PathAssignment();
-			other = msg.substring<SmallString>(msg.index_of('}') + 1);
+			other = msg.substring<DefaultString>(msg.index_of('}') + 1);
 
 			outObj.alternative = MyVariant::alternative_t::pathassignment;
 			deserializePathAssignment(other, outObj.value.pa);

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <stdint.h>
 #include <chrono>
 #include <thread>
@@ -162,7 +162,7 @@ namespace details
 	class SerialImpl
 	{
 	public:
-		SerialImpl(int thisPort, int connPort) : _thisPort(thisPort), _connectionPort(connPort), _udp(WiFiUDP())
+		SerialImpl(int thisPort, int connPort, bool printToConsole) : _thisPort(thisPort), _connectionPort(connPort), _udp(WiFiUDP()), _printToConsole(printToConsole)
 		{}
 
 		void println(const std::string& message)
@@ -172,9 +172,11 @@ namespace details
 
 		void print(const std::string& message)
 		{
-			if (_connectionPort == 0)
+			if (_printToConsole) 
+			{
 				std::cout << message;
-			else
+			}
+			if(_connectionPort != 0)
 			{
 				IPAddress ip(127, 0, 0, 1);
 				_udp.beginPacket(ip, _connectionPort);
@@ -198,21 +200,11 @@ namespace details
 		}
 
 	private:
+		bool _printToConsole;
 		int _thisPort;
 		int _connectionPort;
 		WiFiUDP _udp;
 	};
-}
-
-namespace ESP32Board
-{
-	inline static details::SerialImpl Serial(0, 0);
-	inline static details::SerialImpl Serial2(105, 106);
-}
-
-namespace UnoBoard
-{
-	inline static details::SerialImpl Serial(106, 105);
 }
 
 static details::WireImpl Wire;

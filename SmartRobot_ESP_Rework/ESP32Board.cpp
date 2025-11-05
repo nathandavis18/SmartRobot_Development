@@ -4,11 +4,215 @@
 #include "SmartRobotDtos.h"
 #include "String.hpp"
 #include "ESP32Board.hpp"
+#include "SmartRobot_Rework_ESP.hpp"
+
+
+namespace ESP32Board 
+{
+	// Some networking stuff
+	constexpr char ssid[] = "SR_Test";
+	constexpr char pass[] = "srtest1234";
+	WiFiUDP udpSocket;
+	const IPAddress serverIp(192, 168, 137, 1);
+	constexpr int serverPort = 1818;
+	constexpr int localPort = 100;
+
+	// Connection status
+	bool connected = false;
+	constexpr unsigned int connectionTimeoutMs = 5000;
+	unsigned long lastMessageTime = 0;
+
+	// DTOs to send to Mobius
+	sr::Attitude attitude{};
+	sr::Position position{};
+	sr::Velocity velocity{};
+	enum class MessageToSend
+	{
+		AttitudeMsg,
+		PositionMsg,
+		VelocityMsg
+	};
+	MessageToSend messageToSend = MessageToSend::AttitudeMsg;
+	double finalX = 0, finalY = 0;
+
+	// Some stuff for communicating with the Uno board
+	constexpr uint8_t RXD2 = 3;
+	constexpr uint8_t TXD2 = 40;
+	sr::RobotMessageData robotMsgData;
+
+	// A custom variant to parse incoming messages
+	sr::MyVariant variant;
+
+	// Strings to receive incoming messages and send messages
+	sr::DefaultString udpReceiveBuff, udpSendBuff;
+	sr::DefaultString serialReceiveBuff, serialSendBuff;
+
+	// Start the WiFi connection to communicate with Mobius
+	void connect_to_wifi() 
+	{
+		if (WiFi.status() == WL_CONNECTED) return;
+		WiFi.begin(ssid, pass);
+		while(WiFi.status() != WL_CONNECTED) 
+			delay(50);
+	}
+
+	void send_message_to_mobius()
+	{
+		udpSocket.beginPacket(serverIp, serverPort);
+		udpSocket.print(udpSendBuff.c_str());
+		udpSocket.endPacket();
+		udpSendBuff.clear();
+	}
+
+	void send_message_to_robot()
+	{
+		Serial2.print(serialSendBuff.c_str());
+		serialSendBuff.clear();
+	}
+
+	void send_asset_connection_message()
+	{
+		sr::SmartRobotAsset asset;
+		sr::serialize<sr::SmartRobotAsset>(asset, udpSendBuff);
+
+		do
+		{
+			udp.beginPacket(serverIp, serverPort);
+			udp.print(udpSendBuff.c_str());
+			udp.endPacket();
+
+			delay(300);
+			udp.parsePacket();
+			if (udp.available())
+			{
+				udp.readString();
+				connected = true;
+			}
+		} while (!connected);
+
+		udpSendBuff.clear();
+		lastMessageTime = millis();
+	}
+
+	// Start all of the serial communications and connect to Mobius server
+	void setup()
+	{
+		Serial.begin(9600);
+		Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
+		connect_to_wifi();
+		udpSocket.begin(localPort);
+		send_asset_connection_message();
+	}
+
+	void send_dtos()
+	{
+		switch (messageToSend)
+		{
+			case MessageToSend::AttitudeMsg:
+				sr::serialize<sr::Attitude>(attitude, udpSendBuff);
+				messageToSend = MessageToSend::PositionMsg;
+				break;
+			case MessageToSend::PositionMsg:
+				sr::serialize<sr::Position>(position, udpSendBuff);
+				messageToSend = MessageToSend::VelocityMsg;
+				break;
+			case MessageToSend::VelocityMsg:
+				sr::serialize<sr::Velocity>(velocity, udpSendBuff);
+				messageToSend = MessageToSend::AttitudeMsg;
+				break;
+		}
+		send_message_to_mobius();
+	}
+
+	// TODO: Finish implementing the new path assignment handler
+	void handle_incoming_path_assignment(const sr::PathAssignment& pa)
+	{
+		if (pa.waypoints.size() == 0)
+			return;
+		finalX = pa.waypoints.last().x;
+		finalY = pa.waypoints.last().y;
+		// Send waypoints to robot here
+	}
+
+	void read_single_message_from_mobius()
+	{
+		udpSocket.parsePacket();
+		int bytesAvailable = udpSocket.available();
+		if (bytesAvailable)
+		{
+			char c = 0;
+			while (bytesAvailable--) 
+			{
+				c = udpSocket.read();
+				if (c == '\x1b')
+					break;
+				udpReceiveBuff += c;
+			}
+
+			sr::deserialize(udpReceiveBuff, variant);
+			switch(variant.alternative)
+			{
+				case sr::MyVariant::alternative_t::pathassignment:
+					handle_incoming_path_assignment(variant.value.pa);
+					break;
+				case sr::MyVariant::alternative_t::stop:
+					serialSendBuff = "{stop}\x1b";
+					send_message_to_robot();
+					break;
+				default:
+					break;
+			}
+			lastMessageTime = millis();
+		}
+	}
+
+	void read_single_message_from_robot()
+	{
+		int bytesAvailable = Serial2.available();
+		if (bytesAvailable)
+		{
+			char c = 0;
+			while(bytesAvailable--)
+			{
+				c = Serial2.read();
+				if (c == '\x1b')
+					break;
+				serialReceiveBuff += c;
+			}
+			bool success = sr::deserializeRobotMessage(serialReceiveBuff, robotMsgData);
+			switch (robotMsgData.type)
+			{
+			case sr::MsgFromRobotType::Distance:
+				// Handle distance message
+				break;
+			case sr::MsgFromRobotType::Standby:
+				// Handle standby message
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	// Main loop
+	void loop()
+	{
+		if(millis() - lastMessageTime > connectionTimeoutMs)
+			connected = false;
+		if(WiFi.status() != WL_CONNECTED)
+			connect_to_wifi();
+		if(!connected)
+			send_asset_connection_message();
+
+		// Now that all the checks are done, we can handle communication
+		send_dtos();
+		read_single_message_from_mobius();
+		// TODO: Finish other communication things
+	}
+}
 
 namespace ESP32Board
 {
-#define RXD2 3
-#define TXD2 40
 	constexpr char ssid[] = "SR_Test";
 	constexpr char pass[] = "srtest1234";
 
@@ -263,6 +467,7 @@ namespace ESP32Board
 		if (standby && currentInterval - lastStandbyInterval >= standbyInterval)
 		{
 			message = "{Smart Robot,StandbyMode}";
+			Serial.println(F("Sending Standby Mode"));
 			udp.beginPacket(serverIp, serverPort);
 			udp.print(message.c_str());
 			udp.endPacket();

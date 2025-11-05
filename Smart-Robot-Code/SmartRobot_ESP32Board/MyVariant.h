@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #pragma warning(disable : 4996)
 #include "SmartRobotDtos.h"
 
@@ -19,7 +19,7 @@ namespace sr
 
 		enum class alternative_t
 		{
-			attitude, pathassignment, position, velocity, none
+			attitude, pathassignment, position, velocity, stop, none
 		};
 		alternative_t alternative;
 
@@ -41,7 +41,7 @@ namespace sr
 			case alternative_t::velocity:
 				this->value.v = other.value.v;
 				break;
-			case alternative_t::none:
+			default:
 				break;
 			}
 		}

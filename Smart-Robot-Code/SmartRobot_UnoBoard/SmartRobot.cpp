@@ -1,8 +1,9 @@
-#include "SmartRobot.h"
+﻿#include "SmartRobot.h"
 #include "../lib/Array.hpp"
 #include "../lib/String.hpp"
 #include "../lib/JsonDict.hpp"
-#include "../../UnoBoard.hpp"
+#include "../../SmartRobot_Uno_Rework/UnoBoard.hpp"
+#include "../../SmartRobot_Uno_Rework/SmartRobot_Rework_Uno.hpp"
 
 namespace sr
 {
