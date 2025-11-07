@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #pragma warning(disable : 4996)
 #include <type_traits>
 #include "MyVariant.h"
@@ -19,9 +19,13 @@ namespace sr
 	{
 		MsgFromRobotType type = MsgFromRobotType::None;
 		double distance;
+		double velocity;
+		double heading;
 		void clear()
 		{
 			distance = 0;
+			velocity = 0;
+			heading = 0;
 			type = MsgFromRobotType::None;
 		}
 	};

@@ -6,6 +6,7 @@ namespace sr
 	DefaultString other;
 	MyArray<SplitsString, 2> headerParts;
 	MyArray<SplitsString, 6> waypointParts;
+	MyArray<SplitsString, 3> distanceParts;
 	Waypoint wp;
 
 	bool deserializeRobotMessage(const DefaultString& msg, RobotMessageData& outObj)
@@ -26,7 +27,10 @@ namespace sr
 			{
 				outObj.type = MsgFromRobotType::Distance;
 				other = msg.substring<DefaultString>(msg.index_of('}') + 1);
-				outObj.distance = other.to_double();
+				split<3>(other.substring<HeaderString>(0), distanceParts);
+				outObj.distance = distanceParts[0].to_double();
+				outObj.velocity = distanceParts[1].to_double();
+				outObj.heading = distanceParts[2].to_double();
 			}
 			else
 			{
@@ -72,7 +76,8 @@ namespace sr
 
 	void deserialize(const DefaultString& msg, MyVariant& outObj)
 	{
-		split<2>(msg.substring<HeaderString>(1, msg.index_of('}') - 1), headerParts);
+		if (msg.length() > 0)
+			split<2>(msg.substring<HeaderString>(1, msg.index_of('}') - 1), headerParts);
 
 		if (headerParts[1] == "PathAssignment")
 		{

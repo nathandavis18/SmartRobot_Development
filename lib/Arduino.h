@@ -65,7 +65,7 @@ public:
 	{
 		try
 		{
-			const MinimalSocket::Timeout timeout = MinimalSocket::Timeout(500);
+			const MinimalSocket::Timeout timeout = MinimalSocket::Timeout(50);
 			auto buffer = _socket->receive(1000, timeout);
 			if (buffer.has_value())
 			{
@@ -131,8 +131,7 @@ namespace timestuff
 
 inline const long long millis()
 {
-	auto now = std::chrono::steady_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - timestuff::startTime);
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - timestuff::startTime);
 	return duration.count();
 }
 
