@@ -193,5 +193,5 @@ namespace sr
 	using SmallString = details::BasicCustomString<400>;
 	using HeaderString = details::BasicCustomString<100>;
 	using SplitsString = details::BasicCustomString<30>;
-	using TinyString = details::BasicCustomString<30>;
+	using TinyString = details::BasicCustomString<60>;
 }

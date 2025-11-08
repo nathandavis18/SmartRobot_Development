@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <Arduino.h>
 #include "DeviceDrivers.h"
 
@@ -18,12 +18,11 @@ namespace sr
 
 		void SmartRobotInit();
 
-		void updateMotion(float speed, float distance);
+		void updateMotion(float speed);
 		void updateAngle(float newHeading);
-		void getSerialData(void);
+		void handle_incoming_data(void);
 		void updateDistanceData(void);
-		void updateDistanceLeft(void);
-		void sendDistanceMoved(bool forced = false);
+		void sendDistanceMoved(const float distance);
 		void startCommand(void);
 
 	public:
@@ -45,11 +44,13 @@ namespace sr
 
 	private:
 		float _currentHeading;
+		float _currentVelocity;
+
 		SmartRobotMode _mode;
 		DeviceDriver_Motor _motorControl;
 		DeviceDriver_Voltage _voltageControl;
 		DeviceDriver_Key _keyControl;
 
-		static constexpr float angleEpsilon = 10;
+		static constexpr float angleEpsilon = 3.0f;
 	};
 }

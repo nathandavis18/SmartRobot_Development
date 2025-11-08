@@ -157,7 +157,7 @@ namespace ESP32Board
 
 		Serial.println(F("Sending path assignment Ack"));
 		udpSendBuff = "{Smart Robot,AssignmentReceived}";
-		udpSendBuff.concat((int)pa.pathID);
+		udpSendBuff.concat(static_cast<int>(pa.pathID));
 		send_message_to_mobius();
 	}
 
@@ -198,6 +198,7 @@ namespace ESP32Board
 			}
 			lastMessageTime = millis();
 			udpReceiveBuff.clear();
+			variant.clear();
 		}
 	}
 
@@ -215,6 +216,10 @@ namespace ESP32Board
 		Serial.println(F("Standby message received from robot"));
 		udpSendBuff = "{Smart Robot,StandbyMode}";
 		send_message_to_mobius();
+
+		position.x = finalX;
+		position.y = finalY;
+		velocity.x = 0;
 	}
 
 	void read_single_message_from_robot()
@@ -230,19 +235,22 @@ namespace ESP32Board
 					break;
 				serialReceiveBuff += c;
 			}
-			bool success = sr::deserializeRobotMessage(serialReceiveBuff, robotMsgData);
-			switch (robotMsgData.type)
+			if (sr::deserializeRobotMessage(serialReceiveBuff, robotMsgData))
 			{
-			case sr::MsgFromRobotType::Distance:
-				handle_distance_message();
-				break;
-			case sr::MsgFromRobotType::Standby:
-				handle_standby_message();
-				break;
-			default:
-				break;
+				switch (robotMsgData.type)
+				{
+				case sr::MsgFromRobotType::Distance:
+					handle_distance_message();
+					break;
+				case sr::MsgFromRobotType::Standby:
+					handle_standby_message();
+					break;
+				default:
+					break;
+				}
 			}
 		}
+		serialReceiveBuff.clear();
 	}
 
 	// Start all of the serial communications and connect to Mobius server

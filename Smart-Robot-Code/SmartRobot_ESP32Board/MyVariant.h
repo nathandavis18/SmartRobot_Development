@@ -66,5 +66,27 @@ namespace sr
 				break;
 			}
 		}
+
+		void clear()
+		{
+			switch (alternative)
+			{
+			case alternative_t::attitude:
+				this->value.a.~Attitude();
+				break;
+			case alternative_t::pathassignment:
+				this->value.pa.~PathAssignment();
+				break;
+			case alternative_t::position:
+				this->value.p.~Position();
+				break;
+			case alternative_t::velocity:
+				this->value.v.~Velocity();
+				break;
+			case alternative_t::none:
+				break;
+			}
+			alternative = alternative_t::none;
+		}
 	};
 }

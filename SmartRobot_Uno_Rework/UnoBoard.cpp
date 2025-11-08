@@ -1,9 +1,9 @@
-#include "SmartRobot.h"
+﻿#include "SmartRobot.h"
 #include "UnoBoard.hpp"
 
 namespace UnoBoard
 {
-    sr::SmartRobot robot;
+    static sr::SmartRobot robot;
     void setup()
     {
         robot.SmartRobotInit();
@@ -12,7 +12,7 @@ namespace UnoBoard
     void loop()
     {
         if (!robot.isMoving)
-            robot.getSerialData();
+            robot.handle_incoming_data();
         else
         {
             robot.updateDistanceData();
