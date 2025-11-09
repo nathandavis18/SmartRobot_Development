@@ -130,6 +130,15 @@ namespace sr
 		{
 			segments.clear();
 
+			if (receiveBuffer == "{stop}")
+			{
+				const float distanceMoved = _currentVelocity * (timeDiff / 1000.0) * 8;
+				stopRobot();
+				sendDistanceMoved(distanceMoved);
+				receiveBuffer.clear();
+				return;
+			}
+
 			int strIndex = 0;
 			MyDictionary dict;
 
@@ -171,7 +180,6 @@ namespace sr
 
 		_currentVelocity = fabs(segments.at(currentSegmentIndex).velocity);
 		updateAngle(segments.at(currentSegmentIndex).heading);
-
 		lastDistanceUpdateTime = millis();
 		if (segments.at(currentSegmentIndex).distance > 0)
 			updateMotion(_currentVelocity);
@@ -181,7 +189,7 @@ namespace sr
 
 	void SmartRobot::updateDistanceData()
 	{
-		delay(5);
+		delay(3);
 		if (segments.at(currentSegmentIndex).distance <= 0)
 		{
 			if (++currentSegmentIndex < segments.size())
@@ -202,10 +210,11 @@ namespace sr
 			return;
 		}
 
+		_currentVelocity = segments.at(currentSegmentIndex).velocity;
 		currentInterval = millis();
 		timeDiff = currentInterval - lastDistanceUpdateTime;
 
-		const float distanceMoved = _currentVelocity * (timeDiff / 1000.0) * 10;
+		const float distanceMoved = _currentVelocity * (timeDiff / 1000.0) * 8;
 		segments.at(currentSegmentIndex).distance -= distanceMoved;
 		lastDistanceUpdateTime = currentInterval;
 
@@ -265,6 +274,8 @@ namespace sr
 
 	void SmartRobot::stopRobot()
 	{
+		isMoving = false;
+		_currentVelocity = 0;
 		_motorControl.setMotorControl(false, 0, false, 0);
 	}
 }

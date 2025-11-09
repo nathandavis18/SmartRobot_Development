@@ -37,6 +37,7 @@ namespace sr
 				outObj.type == MsgFromRobotType::None;
 			}
 		clearandend:
+			distanceParts.clear();
 			headerParts.clear();
 			other.clear();
 		}
@@ -86,6 +87,10 @@ namespace sr
 
 			outObj.alternative = MyVariant::alternative_t::pathassignment;
 			deserializePathAssignment(other, outObj.value.pa);
+		}
+		else if (headerParts[1] == "ClearAssignment")
+		{
+			outObj.alternative = MyVariant::alternative_t::stop;
 		}
 		else
 		{

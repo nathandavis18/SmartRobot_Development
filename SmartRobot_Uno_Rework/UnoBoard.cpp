@@ -11,9 +11,8 @@ namespace UnoBoard
 
     void loop()
     {
-        if (!robot.isMoving)
-            robot.handle_incoming_data();
-        else
+        robot.handle_incoming_data();
+        if (robot.isMoving)
         {
             robot.updateDistanceData();
         }

@@ -94,8 +94,14 @@ namespace ESP32Board
 
 	}
 
+	static unsigned long timeSinceLastSend = 0;
+	constexpr uint8_t minimumTimeBetweenSendMs = 100;
 	void send_dtos()
 	{
+		if (millis() - timeSinceLastSend < minimumTimeBetweenSendMs)
+			return;
+		timeSinceLastSend = millis();
+
 		switch (messageToSend)
 		{
 			case MessageToSend::AttitudeMsg:
@@ -204,10 +210,10 @@ namespace ESP32Board
 
 	void handle_distance_message()
 	{
+		attitude.yaw = robotMsgData.heading;
+		velocity.x = robotMsgData.velocity;
 		position.x += robotMsgData.distance * std::cos(attitude.yaw);
 		position.y += robotMsgData.distance * std::sin(attitude.yaw);
-		velocity.x = robotMsgData.velocity;
-		attitude.yaw = robotMsgData.heading;
 		Serial.println(F("Distance message received from robot"));
 	}
 
