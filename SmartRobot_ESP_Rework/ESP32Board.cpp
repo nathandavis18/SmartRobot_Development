@@ -117,7 +117,6 @@ namespace ESP32Board
 				messageToSend = MessageToSend::AttitudeMsg;
 				break;
 		}
-		Serial.print(F("Sending DTO: ")); Serial.println(udpSendBuff.c_str());
 		send_message_to_mobius();
 	}
 
