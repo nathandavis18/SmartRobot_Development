@@ -132,7 +132,7 @@ namespace sr
 
 			if (receiveBuffer == "{stop}")
 			{
-				const float distanceMoved = _currentVelocity * (timeDiff / 1000.0) * 8;
+				const float distanceMoved = _currentVelocity * (timeDiff / 1000.0) * 5;
 				stopRobot();
 				sendDistanceMoved(distanceMoved);
 				receiveBuffer.clear();
@@ -214,7 +214,7 @@ namespace sr
 		currentInterval = millis();
 		timeDiff = currentInterval - lastDistanceUpdateTime;
 
-		const float distanceMoved = _currentVelocity * (timeDiff / 1000.0) * 8;
+		const float distanceMoved = _currentVelocity * (timeDiff / 1000.0) * 5;
 		segments.at(currentSegmentIndex).distance -= distanceMoved;
 		lastDistanceUpdateTime = currentInterval;
 
