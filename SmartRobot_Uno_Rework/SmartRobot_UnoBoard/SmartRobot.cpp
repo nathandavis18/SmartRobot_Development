@@ -7,17 +7,17 @@
 
 namespace helpers
 {
-	float get_degrees(float radians)
+	float get_degrees(const float radians)
 	{
 		return radians * 180 / 3.14;
 	}
 
-	float get_radians(float degrees)
+	float get_radians(const float degrees)
 	{
 		return degrees * 3.14 / 180;
 	}
 
-	bool should_spin_clockwise(float currentHeading, float newHeading)
+	bool should_spin_clockwise(const float currentHeading, const float newHeading)
 	{
 		if (currentHeading <= 0)
 		{
@@ -34,7 +34,7 @@ namespace helpers
 		return newHeading < currentHeading;
 	}
 
-	int get_rotation_time(float currentHeading, float newHeading)
+	int get_rotation_time(const float currentHeading, const float newHeading)
 	{
 		static constexpr float timePerDegree = 60.0 / 9.0;
 		if((currentHeading < 0 && newHeading < 0) || (currentHeading >= 0 && newHeading >= 0))
@@ -60,7 +60,7 @@ namespace helpers
 		return static_cast<int>((180 - fabs(newHeading + rotationAmount)) * timePerDegree);
 	}
 
-	bool angle_is_same(float currentHeading, float newHeading, float epsilon)
+	bool angle_is_same(const float currentHeading, const float newHeading, const float epsilon)
 	{
 		return fabs(currentHeading - newHeading) <= epsilon;
 	}

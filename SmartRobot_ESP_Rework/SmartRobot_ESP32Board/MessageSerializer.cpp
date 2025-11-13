@@ -7,6 +7,7 @@ namespace sr
 	MyArray<SplitsString, 2> headerParts;
 	MyArray<SplitsString, 6> waypointParts;
 	MyArray<SplitsString, 3> distanceParts;
+	MyArray<SplitsString, 2> teleopParts;
 	Waypoint wp;
 
 	bool deserializeRobotMessage(const DefaultString& msg, RobotMessageData& outObj)
@@ -75,6 +76,17 @@ namespace sr
 		waypointParts.clear();
 	}
 
+	void deserializeTeleopCommand(const DefaultString& msg, TeleopCommand& outObj)
+	{
+		split<2>(msg.substring<HeaderString>(0), teleopParts);
+		if (teleopParts.size() == 2)
+		{
+			outObj.velocity = teleopParts[0].to_double();
+			outObj.turnRate = teleopParts[1].to_double();
+		}
+		teleopParts.clear();
+	}
+
 	void deserialize(const DefaultString& msg, MyVariant& outObj)
 	{
 		if (msg.length() > 0)
@@ -91,6 +103,14 @@ namespace sr
 		else if (headerParts[1] == "ClearAssignment")
 		{
 			outObj.alternative = MyVariant::alternative_t::stop;
+		}
+		else if (headerParts[1] == "TeleopCommand")
+		{
+			outObj.value.tc = TeleopCommand();
+			other = msg.substring<DefaultString>(msg.index_of('}') + 1);
+
+			outObj.alternative = MyVariant::alternative_t::teleop;
+			deserializeTeleopCommand(other, outObj.value.tc);
 		}
 		else
 		{

@@ -35,6 +35,12 @@ namespace sr
 		PathAssignment() : pathID(0), waypoints(MyArray<Waypoint, 20>()) {}
 	};
 
+	struct TeleopCommand
+	{
+		double velocity, turnRate;
+		TeleopCommand() : velocity(0), turnRate(0) {}
+	};
+
 	struct SmartRobotAsset
 	{
 		static constexpr char name[] = "Smart Robot";

@@ -13,13 +13,14 @@ namespace sr
 			PathAssignment pa;
 			Position p;
 			Velocity v;
+			TeleopCommand tc;
 			Value() {}
 			~Value() {}
 		} value;
 
 		enum class alternative_t
 		{
-			attitude, pathassignment, position, velocity, stop, none
+			attitude, pathassignment, position, velocity, stop, teleop, none
 		};
 		alternative_t alternative;
 
@@ -62,6 +63,9 @@ namespace sr
 			case alternative_t::velocity:
 				this->value.v.~Velocity();
 				break;
+			case alternative_t::teleop:
+				this->value.tc.~TeleopCommand();
+				break;
 			case alternative_t::none:
 				break;
 			}
@@ -82,6 +86,9 @@ namespace sr
 				break;
 			case alternative_t::velocity:
 				this->value.v.~Velocity();
+				break;
+			case alternative_t::teleop:
+				this->value.tc.~TeleopCommand();
 				break;
 			case alternative_t::none:
 				break;

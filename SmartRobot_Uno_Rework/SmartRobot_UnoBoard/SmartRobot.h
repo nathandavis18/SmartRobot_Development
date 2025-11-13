@@ -29,7 +29,7 @@ namespace sr
 		bool isMoving = false;
 
 	private:
-		enum SmartRobotMode
+		enum class SmartRobotMode
 		{
 			Standby,
 			Moving,

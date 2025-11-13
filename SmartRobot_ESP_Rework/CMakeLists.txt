@@ -17,10 +17,10 @@ add_executable(SmartRobot_Rework_ESP
 	"EspMain.cpp"
     "SmartRobot_Rework_ESP.cpp"
     "ESP32Board.cpp" "ESP32Board.hpp"
-    "../Smart-Robot-Code/SmartRobot_ESP32Board/MessageSerializer.cpp"
+    "SmartRobot_ESP32Board/MessageSerializer.cpp"
 	"../lib/Arduino.h")
 
-target_include_directories(SmartRobot_Rework_ESP PRIVATE ../lib ../Smart-Robot-Code/SmartRobot_ESP32Board ../Smart-Robot-Code/lib)
+target_include_directories(SmartRobot_Rework_ESP PRIVATE ../lib SmartRobot_ESP32Board ../Smart-Robot-Code/lib)
 target_link_libraries(SmartRobot_Rework_ESP PRIVATE
     MinimalSocket
 )

@@ -173,6 +173,12 @@ namespace ESP32Board
 		send_message_to_robot();
 	}
 
+	void handle_teleop_command(const sr::TeleopCommand& cmd)
+	{
+		Serial.println(F("Handling teleop command"));
+		Serial.println(std::to_string(cmd.velocity) + "," + std::to_string(cmd.turnRate));
+	}
+
 	void read_single_message_from_mobius()
 	{
 		udpSocket.parsePacket();
@@ -197,6 +203,9 @@ namespace ESP32Board
 					break;
 				case sr::MyVariant::alternative_t::stop:
 					send_stop_to_robot();
+					break;
+				case sr::MyVariant::alternative_t::teleop:
+					handle_teleop_command(variant.value.tc);
 					break;
 				default:
 					break;
