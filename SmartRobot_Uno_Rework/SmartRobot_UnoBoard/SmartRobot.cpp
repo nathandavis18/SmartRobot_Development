@@ -130,15 +130,6 @@ namespace sr
 		{
 			segments.clear();
 
-			if (receiveBuffer == "{stop}")
-			{
-				const float distanceMoved = _currentVelocity * (timeDiff / 1000.0) * 5;
-				stopRobot();
-				sendDistanceMoved(distanceMoved);
-				receiveBuffer.clear();
-				return;
-			}
-
 			int strIndex = 0;
 			MyDictionary dict;
 
@@ -151,27 +142,127 @@ namespace sr
 				}
 
 				parse_json(splitDataBuffer, dict);
-
-				Command currentSegment;
-				currentSegment.velocity = dict["v"];
-				currentSegment.distance = dict["d"];
-				currentSegment.heading = helpers::get_degrees(dict["h"]);
-				
-				dict.clear();
 				splitDataBuffer.clear();
+				if (static_cast<int>(dict["type"]) == 0)
+				{
+					const float distanceMoved = _currentVelocity * (timeDiff / 1000.0) * 5;
+					stopRobot();
+					sendDistanceMoved(distanceMoved);
+					receiveBuffer.clear();
+					return;
+				}
+				if (static_cast<int>(dict["type"]) == 1)
+				{
+					Command currentSegment;
+					currentSegment.velocity = dict["v"];
+					currentSegment.distance = dict["d"];
+					currentSegment.heading = helpers::get_degrees(dict["h"]);
 
-				segments.insert_back(currentSegment);
-				++strIndex;
+					dict.clear();
+
+					segments.insert_back(currentSegment);
+					++strIndex;
+				}
+				else if (static_cast<int>(dict["type"]) == 2)
+				{
+					Command currentCommand;
+					currentCommand.velocity = dict["tv"];
+					currentCommand.heading = dict["tr"];
+					currentCommand.distance = dict["dir"];
+					executeTeleopCommand(currentCommand);
+				}
 			}
 
 			receiveBuffer.clear();
 			send_message();
 
 			currentSegmentIndex = 0;
-			startCommand();
+			if (segments.size() > 0)
+				startCommand();
 		}
 		else if (receiveBuffer.length() && receiveBuffer.char_at(0) != '{') 
 			receiveBuffer.clear();
+	}
+
+	float teleopDistance = 0;
+	static const float teleopEpsilon = 0.05;
+	void SmartRobot::executeTeleopCommand(const Command& command)
+	{
+		int16_t speedUnits = 0;
+		if (fabs(command.velocity) > teleopEpsilon)
+			speedUnits = fabs(command.velocity) / 100 * 255 * static_cast<int>(command.distance);
+		_currentVelocity = speedUnits / 35;
+		if (speedUnits > 255)
+			speedUnits = 255;
+
+		moveTeleopRobot(speedUnits, command.heading, command.distance > 0);
+		teleopDistance += (millis() - lastDistanceUpdateTime) / 1000.0 * _currentVelocity * 3;
+		lastDistanceUpdateTime = millis();
+		if (fabs(teleopDistance) > 0.05)
+		{
+			sendDistanceMoved(teleopDistance);
+			std::cout << "Teleop Distance Moved: " << teleopDistance << " at Velocity: " << command.velocity << " Heading: " << command.heading << std::endl;
+			teleopDistance = 0;
+		}
+		else
+			sendDistanceMoved(0);
+	}
+
+	void SmartRobot::moveTeleopRobot(int16_t speedUnits, const float turnRate, bool forward)
+	{
+		bool turnDirection = turnRate > 0;
+		if (speedUnits == 0)
+		{
+			speedUnits = 150 * (fabs(turnRate) / 100);
+			if (turnDirection)
+			{
+				_motorControl.setMotorControl(true, speedUnits, false, speedUnits);
+				_currentHeading -= speedUnits / 10;
+			}
+			else
+			{
+				_motorControl.setMotorControl(false, speedUnits, true, speedUnits);
+				_currentHeading += speedUnits / 10;
+			}
+		}
+		else
+		{
+			float turnOffset = 1;
+			if (fabs(turnRate) > teleopEpsilon)
+				turnOffset += fabs(turnRate) / 100;
+			if (forward)
+			{
+				if (turnDirection)
+				{
+					_motorControl.setMotorControl(true, speedUnits, true, speedUnits / turnOffset);
+					if (turnOffset > 1)
+						_currentHeading -= speedUnits / 30 * turnOffset;
+				}
+				else
+				{
+					_motorControl.setMotorControl(true, speedUnits / turnOffset, true, speedUnits);
+					if (turnOffset > 1)
+						_currentHeading += speedUnits / 30 * turnOffset;
+				}
+			}
+			else
+			{
+				if (turnDirection)
+				{
+					_motorControl.setMotorControl(false, speedUnits / turnOffset, false, speedUnits);
+					if (turnOffset > 1)
+						_currentHeading -= speedUnits / 30 * turnOffset;
+				}
+				else
+				{
+					_motorControl.setMotorControl(false, speedUnits, false, speedUnits / turnOffset);
+					if (turnOffset > 1)
+						_currentHeading += speedUnits / 30 * turnOffset;
+				}
+			}
+		}
+		if (_currentHeading < -180) _currentHeading += 360;
+		else if (_currentHeading > 180) _currentHeading -= 360;
 	}
 
 	void SmartRobot::startCommand()

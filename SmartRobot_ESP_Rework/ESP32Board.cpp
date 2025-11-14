@@ -169,14 +169,23 @@ namespace ESP32Board
 	void send_stop_to_robot()
 	{
 		Serial.println(F("Stopping robot"));
-		serialSendBuff = "{stop}";
+		serialSendBuff = "{\"type\":0}";
 		send_message_to_robot();
 	}
 
 	void handle_teleop_command(const sr::TeleopCommand& cmd)
 	{
+		serialSendBuff = "{\"type\":2,";
+		serialSendBuff.concat("\"tv\":");
+		serialSendBuff.concat(cmd.velocity);
+		serialSendBuff.concat(",\"tr\":");
+		serialSendBuff.concat(cmd.turnRate);
+		serialSendBuff.concat(",\"dir\":");
+		serialSendBuff.concat(cmd.direction);
+		serialSendBuff.concat("}");
+
 		Serial.println(F("Handling teleop command"));
-		Serial.println(std::to_string(cmd.velocity) + "," + std::to_string(cmd.turnRate) + "," + std::to_string(cmd.direction));
+		send_message_to_robot();
 	}
 
 	void read_single_message_from_mobius()

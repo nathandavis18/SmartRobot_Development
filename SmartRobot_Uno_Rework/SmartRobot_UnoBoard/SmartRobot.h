@@ -41,6 +41,8 @@ namespace sr
 		void updateRobotAngle(bool leftDirection, bool rightDirection, float headingToFace);
 		void moveRobot(uint8_t speed, bool forward = true);
 		void stopRobot();
+		void executeTeleopCommand(const Command& command);
+		void moveTeleopRobot(int16_t speedUnits, const float turnRate, bool forward);
 
 	private:
 		float _currentHeading;
