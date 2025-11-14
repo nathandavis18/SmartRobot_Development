@@ -38,7 +38,8 @@ namespace sr
 	struct TeleopCommand
 	{
 		double velocity, turnRate;
-		TeleopCommand() : velocity(0), turnRate(0) {}
+		int8_t direction;
+		TeleopCommand() : velocity(0), turnRate(0), direction(0) {}
 	};
 
 	struct SmartRobotAsset

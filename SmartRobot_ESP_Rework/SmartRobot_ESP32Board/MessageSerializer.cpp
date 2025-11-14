@@ -7,7 +7,7 @@ namespace sr
 	MyArray<SplitsString, 2> headerParts;
 	MyArray<SplitsString, 6> waypointParts;
 	MyArray<SplitsString, 3> distanceParts;
-	MyArray<SplitsString, 2> teleopParts;
+	MyArray<SplitsString, 3> teleopParts;
 	Waypoint wp;
 
 	bool deserializeRobotMessage(const DefaultString& msg, RobotMessageData& outObj)
@@ -78,11 +78,12 @@ namespace sr
 
 	void deserializeTeleopCommand(const DefaultString& msg, TeleopCommand& outObj)
 	{
-		split<2>(msg.substring<HeaderString>(0), teleopParts);
-		if (teleopParts.size() == 2)
+		split<3>(msg.substring<HeaderString>(0), teleopParts);
+		if (teleopParts.size() == 3)
 		{
 			outObj.velocity = teleopParts[0].to_double();
 			outObj.turnRate = teleopParts[1].to_double();
+			outObj.direction = static_cast<int8_t>(teleopParts[2].to_int());
 		}
 		teleopParts.clear();
 	}

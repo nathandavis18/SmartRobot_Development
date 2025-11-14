@@ -176,7 +176,7 @@ namespace ESP32Board
 	void handle_teleop_command(const sr::TeleopCommand& cmd)
 	{
 		Serial.println(F("Handling teleop command"));
-		Serial.println(std::to_string(cmd.velocity) + "," + std::to_string(cmd.turnRate));
+		Serial.println(std::to_string(cmd.velocity) + "," + std::to_string(cmd.turnRate) + "," + std::to_string(cmd.direction));
 	}
 
 	void read_single_message_from_mobius()
