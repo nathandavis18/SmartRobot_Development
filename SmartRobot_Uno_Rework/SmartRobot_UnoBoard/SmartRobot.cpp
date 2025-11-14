@@ -201,7 +201,6 @@ namespace sr
 		if (fabs(teleopDistance) > 0.05)
 		{
 			sendDistanceMoved(teleopDistance);
-			std::cout << "Teleop Distance Moved: " << teleopDistance << " at Velocity: " << command.velocity << " Heading: " << command.heading << std::endl;
 			teleopDistance = 0;
 		}
 		else
