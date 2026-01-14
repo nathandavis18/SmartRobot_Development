@@ -18,17 +18,17 @@ add_executable(SmartRobot_Combined
 	"Combined.cpp"
     "SmartRobot_ESP_Rework/SmartRobot_Rework_ESP.cpp"
     "SmartRobot_ESP_Rework/ESP32Board.cpp" "SmartRobot_ESP_Rework/ESP32Board.hpp"
-    "Smart-Robot-Code/SmartRobot_ESP32Board/MessageSerializer.cpp"
+    "SmartRobot_ESP_Rework/SmartRobot_ESP32Board/MessageSerializer.cpp"
 	"lib/Arduino.h"
 
 	"SmartRobot_Uno_Rework/SmartRobot_Rework_Uno.cpp"
 	"SmartRobot_Uno_Rework/UnoBoard.cpp" "SmartRobot_Uno_Rework/UnoBoard.hpp"
-	"Smart-Robot-Code/SmartRobot_UnoBoard/DeviceDrivers.cpp"
-    "Smart-Robot-Code/SmartRobot_UnoBoard/I2Cdev.cpp"
-    "Smart-Robot-Code/SmartRobot_UnoBoard/SmartRobot.cpp"
+	"SmartRobot_Uno_Rework/SmartRobot_UnoBoard/DeviceDrivers.cpp"
+    "SmartRobot_Uno_Rework/SmartRobot_UnoBoard/I2Cdev.cpp"
+    "SmartRobot_Uno_Rework/SmartRobot_UnoBoard/SmartRobot.cpp"
 	"lib/avr/wdt.h")
 
-target_include_directories(SmartRobot_Combined PRIVATE lib Smart-Robot-Code/SmartRobot_ESP32Board Smart-Robot-Code/lib Smart-Robot-Code/SmartRobot_UnoBoard)
+target_include_directories(SmartRobot_Combined PRIVATE lib SmartRobot_ESP_Rework/SmartRobot_ESP32Board Smart-Robot-Code/lib SmartRobot_Uno_Rework/SmartRobot_UnoBoard)
 target_link_libraries(SmartRobot_Combined PRIVATE
     MinimalSocket
 )
